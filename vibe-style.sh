@@ -399,10 +399,15 @@ _vs_song_learned() {
 
 vs-learn() {
   local interval="${1:-10}"
-  local max_checks=12  # 2 min at 10s intervals
+  local max_checks=18  # 3 min at 10s intervals
   local check=0
-  local confidence_threshold=3
+  local confidence_threshold=5
   local last_guess=""
+  local streak=0
+
+  # Mark the start time — only count files modified AFTER this
+  local start_epoch
+  start_epoch=$(date +%s)
 
   # Show the tuning banner
   _vs_learning_banner
@@ -415,28 +420,46 @@ vs-learn() {
 
   # Background learning loop
   {
+    # Wait at least 20s before first check — let the user actually do something
+    sleep 20
+
     while (( check < max_checks )); do
-      sleep "$interval"
       (( check++ ))
 
-      # Run detection
-      local detected=$(_vs_detect_context)
+      # How many minutes since we started?
+      local now_epoch
+      now_epoch=$(date +%s)
+      local elapsed_min=$(( (now_epoch - start_epoch) / 60 + 1 ))
+
+      # Only scan files modified since vs-learn started
+      VS_LEARN_MMIN="$elapsed_min"
+      local test_scores=""
+      test_scores=$(_vs_detect_context_with_score)
+      unset VS_LEARN_MMIN
+
+      local score=${test_scores##* }
+      local detected=${test_scores% *}
       local dir="$(basename "$PWD")"
 
-      # Skip if detection just fell back to directory name
-      if [[ "$detected" == "$dir" ]]; then
+      # Skip weak signals or directory-name fallbacks
+      if [[ "$detected" == "$dir" ]] || (( score < confidence_threshold )); then
+        streak=0
+        last_guess=""
+        sleep "$interval"
         continue
       fi
 
-      # Check if we have a confident match
-      # Re-run to get the actual score
-      local score=0
-      local test_scores=""
-      test_scores=$(_vs_detect_context_with_score)
-      score=${test_scores##* }
-      detected=${test_scores% *}
+      # Require same guess twice in a row (consistency)
+      if [[ "$detected" == "$last_guess" ]]; then
+        (( streak++ ))
+      else
+        streak=1
+        last_guess="$detected"
+        sleep "$interval"
+        continue
+      fi
 
-      if (( score >= confidence_threshold )); then
+      if (( streak >= 2 )); then
         # Determine color
         local color_code
         if [[ -n "${VS_COLORS[$detected]}" ]]; then
@@ -457,6 +480,8 @@ vs-learn() {
 
         return 0
       fi
+
+      sleep "$interval"
     done
 
     # Timed out — just use best guess
@@ -490,8 +515,9 @@ _vs_detect_context_with_score() {
     *research*|*paper*|*lit*)           (( scores_research += 5 )) ;;
   esac
 
+  local mmin="${VS_LEARN_MMIN:-10}"
   local recent_files=""
-  recent_files=$(find . -maxdepth 3 -type f -mmin -10 \
+  recent_files=$(find . -maxdepth 3 -type f -mmin -"$mmin" \
     -not -path '*/.git/*' -not -path '*/node_modules/*' \
     -not -path '*/__pycache__/*' -not -path '*/.venv/*' \
     2>/dev/null | head -30)
