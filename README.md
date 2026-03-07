@@ -273,10 +273,21 @@ You wouldn't wear the same outfit to a rock concert and a board meeting. Why sho
 
 ## 🖥️ Works In
 
-- ✅ VS Code integrated terminal
+- ✅ VS Code integrated terminal (tab names update automatically — see below)
 - ✅ iTerm2
 - ✅ Warp
 - ✅ Alacritty / Kitty / any ANSI 256-color terminal
+
+### VS Code tab names
+
+The installer auto-configures VS Code to show vibe-style labels in terminal tabs (e.g. "⚡ backend" instead of "node"). If you need to set it manually, add to your VS Code `settings.json`:
+
+```json
+{
+  "terminal.integrated.tabs.title": "${sequence} - ${process}",
+  "terminal.integrated.tabs.description": ""
+}
+```
 
 ## 📋 Requirements
 

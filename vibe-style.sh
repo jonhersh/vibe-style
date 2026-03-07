@@ -114,9 +114,11 @@ _vs_clear_topbar() {
 }
 
 _vs_topbar_precmd() {
-  # Redraw the top bar before each prompt (handles resizes, clears)
+  # Redraw the top bar and re-set the tab title before each prompt
+  # (handles resizes, clears, and process name overrides in VS Code)
   if [[ -n "$VS_TAG" && -n "$VS_COLOR" ]]; then
     _vs_draw_topbar "$VS_TAG" "$VS_COLOR"
+    _vs_set_title "⚡ ${VS_TAG}"
   fi
 }
 
