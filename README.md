@@ -122,7 +122,7 @@ vs-learn
   listening to your workflow...
 ```
 
-It watches your file activity every 5 seconds. The moment it's confident:
+It watches your file activity every 10 seconds. The moment it's confident:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -133,8 +133,9 @@ It watches your file activity every 5 seconds. The moment it's confident:
 Plays a shred riff, locks in the style, and you're off. 🔥
 
 ```bash
-vs-learn      # default: checks every 5 seconds
-vs-learn 10   # chill: checks every 10 seconds
+vs-learn      # default: checks every 10 seconds
+vs-learn 5    # impatient: checks every 5 seconds
+vs-learn 20   # chill: checks every 20 seconds
 ```
 
 ---

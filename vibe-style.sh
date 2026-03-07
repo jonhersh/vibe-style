@@ -340,8 +340,8 @@ _vs_song_learned() {
 }
 
 vs-learn() {
-  local interval="${1:-5}"
-  local max_checks=24  # 2 min at 5s intervals
+  local interval="${1:-10}"
+  local max_checks=12  # 2 min at 10s intervals
   local check=0
   local confidence_threshold=3
   local last_guess=""
