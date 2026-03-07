@@ -2,7 +2,7 @@
 
 ### _Because your terminals deserve a soundtrack_ 🎶🕶️
 
-You've got 4 terminals open. You're flipping between them like a DJ switching tracks. Which one's the backend? Which one's grading? You squint. You scroll. You lose 30 seconds of your life you'll never get back.
+You've got 4 terminals open. You're flipping between them like a DJ switching tracks. Which one's the backend? Which one's the frontend? Which one's running that migration? You squint. You scroll. You lose 30 seconds of your life you'll never get back.
 
 **Never again.**
 
@@ -11,12 +11,12 @@ You've got 4 terminals open. You're flipping between them like a DJ switching tr
                          ⚡ backend ⚡
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🟠 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ⚡ grading ⚡
+💜 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                        ⚡ frontend ⚡
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🟢 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                        ⚡ marketing ⚡
+🔴 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         ⚡ devops ⚡
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🟣 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -55,11 +55,10 @@ That's it. Now rip a guitar solo. 🎸🔥
 
 ```bash
 vs backend          # 🔵 blue
-vs marketing        # 🟢 green
-vs grading          # 🟠 orange
-vs data             # 🟣 purple
-vs devops           # 🔴 red
 vs frontend         # 💜 magenta
+vs devops           # 🔴 red
+vs data             # 🟣 purple
+vs marketing        # 🟢 green
 vs design           # 🩷 pink
 vs research         # 🩵 teal
 ```
@@ -95,10 +94,10 @@ It figures out what you're working on by scanning:
 
 | Signal | Example | Result |
 |--------|---------|--------|
-| 📁 Directory name | `cd report-service/` | → `backend` 🔵 |
+| 📁 Directory name | `cd api-server/` | → `backend` 🔵 |
 | 📝 Recent files | Touched `.py` files in last 10 min | → `backend` 🔵 |
 | 📝 Recent files | Editing `.ipynb` notebooks | → `data` 🟣 |
-| 📝 Recent files | Modified `rubric.xlsx` | → `grading` 🟠 |
+| 📝 Recent files | Changed `styles.css`, `App.tsx` | → `frontend` 💜 |
 | 🔀 Git diff | Uncommitted changes to `.html` files | → `frontend` 💜 |
 | 🐳 DevOps files | Changed `Dockerfile` or `deploy.yml` | → `devops` 🔴 |
 
@@ -115,10 +114,9 @@ vs-dir    # fast mode — just checks directory name, no file scanning
 ```
   🔵 ● backend       — APIs, servers, Python/Go/Rust
   💜 ● frontend      — HTML, CSS, React, Vue
-  🟢 ● marketing     — emails, campaigns, copy
-  🟠 ● grading       — rubrics, rosters, assignments
-  🟣 ● data          — notebooks, pandas, ML
   🔴 ● devops        — Docker, CI/CD, deploys
+  🟣 ● data          — notebooks, pandas, ML
+  🟢 ● marketing     — emails, campaigns, copy
   🩷 ● design        — assets, Figma, SVGs
   🩵 ● research      — papers, LaTeX, citations
 ```
