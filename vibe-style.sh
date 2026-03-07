@@ -286,6 +286,208 @@ vs-auto() {
   vs "$detected"
 }
 
+# ── Learning mode 🎶 ────────────────────────────────────────────────────────
+# Starts in "tuning up" state, polls every few seconds, locks in once confident.
+
+VS_LEARN_PID=""
+
+_vs_learning_banner() {
+  local width=60
+  local msg="tuning up..."
+  local pad_total=$(( width - ${#msg} - 4 ))
+  local pad_left=$(( pad_total / 2 ))
+  local pad_right=$(( pad_total - pad_left ))
+
+  printf '\n'
+  printf '\033[48;5;240m\033[38;5;252m\033[1m'
+  printf '%*s' "$width" '' | tr ' ' '~'
+  printf '\033[0m\n'
+  printf '\033[48;5;240m\033[38;5;252m\033[1m'
+  printf '%*s' "$pad_left" ''
+  printf '🎸 %s 🎸' "$msg"
+  printf '%*s' "$pad_right" ''
+  printf '\033[0m\n'
+  printf '\033[48;5;240m\033[38;5;252m\033[1m'
+  printf '%*s' "$width" '' | tr ' ' '~'
+  printf '\033[0m\n'
+  printf '\033[2m  listening to your workflow...\033[0m\n'
+  printf '\n'
+}
+
+_vs_song_learned() {
+  local tag="$1"
+  local color_code="$2"
+  local width=60
+  local msg="song learned! → $tag"
+  local pad_total=$(( width - ${#msg} - 4 ))
+  local pad_left=$(( pad_total / 2 ))
+  local pad_right=$(( pad_total - pad_left ))
+
+  # Clear the tuning banner
+  printf '\n'
+  printf '\033[48;5;%sm\033[38;5;15m\033[1m' "$color_code"
+  printf '%*s' "$width" '' | tr ' ' '━'
+  printf '\033[0m\n'
+  printf '\033[48;5;%sm\033[38;5;15m\033[1m' "$color_code"
+  printf '%*s' "$pad_left" ''
+  printf '🎶 %s 🎶' "$msg"
+  printf '%*s' "$pad_right" ''
+  printf '\033[0m\n'
+  printf '\033[48;5;%sm\033[38;5;15m\033[1m' "$color_code"
+  printf '%*s' "$width" '' | tr ' ' '━'
+  printf '\033[0m\n'
+  printf '\n'
+}
+
+vs-learn() {
+  local interval="${1:-5}"
+  local max_checks=24  # 2 min at 5s intervals
+  local check=0
+  local confidence_threshold=3
+  local last_guess=""
+
+  # Show the tuning banner
+  _vs_learning_banner
+  _vs_set_title "🎸 tuning up..."
+
+  # Kill any existing learning loop
+  if [[ -n "$VS_LEARN_PID" ]] && kill -0 "$VS_LEARN_PID" 2>/dev/null; then
+    kill "$VS_LEARN_PID" 2>/dev/null
+  fi
+
+  # Background learning loop
+  {
+    while (( check < max_checks )); do
+      sleep "$interval"
+      (( check++ ))
+
+      # Run detection
+      local detected=$(_vs_detect_context)
+      local dir="$(basename "$PWD")"
+
+      # Skip if detection just fell back to directory name
+      if [[ "$detected" == "$dir" ]]; then
+        continue
+      fi
+
+      # Check if we have a confident match
+      # Re-run to get the actual score
+      local score=0
+      local test_scores=""
+      test_scores=$(_vs_detect_context_with_score)
+      score=${test_scores##* }
+      detected=${test_scores% *}
+
+      if (( score >= confidence_threshold )); then
+        # Determine color
+        local color_code
+        if [[ -n "${VS_COLORS[$detected]}" ]]; then
+          color_code=$(_vs_color_code "${VS_COLORS[$detected]}")
+        else
+          color_code=$(_vs_hash_color "$detected")
+        fi
+
+        # Song learned!
+        _vs_song_learned "$detected" "$color_code"
+        _vs_play "shred-run.wav"
+
+        # Apply the style
+        VS_TAG="$detected"
+        VS_COLOR="$color_code"
+        _vs_set_title "⚡ ${detected}"
+        _vs_set_prompt "$detected" "$color_code"
+
+        return 0
+      fi
+    done
+
+    # Timed out — just use best guess
+    local fallback=$(_vs_detect_context)
+    vs "$fallback"
+    printf '\033[2m  (best guess after listening)\033[0m\n'
+  } &
+  VS_LEARN_PID=$!
+}
+
+# Extended detect that also returns the score
+_vs_detect_context_with_score() {
+  local scores_backend=0
+  local scores_frontend=0
+  local scores_marketing=0
+  local scores_grading=0
+  local scores_data=0
+  local scores_devops=0
+  local scores_design=0
+  local scores_research=0
+
+  local dir="$(basename "$PWD")"
+  case "$dir" in
+    *backend*|*api*|*server*|*service*) (( scores_backend += 5 )) ;;
+    *site*|*frontend*|*web*|*ui*)       (( scores_frontend += 5 )) ;;
+    *marketing*|*email*|*outreach*)     (( scores_marketing += 5 )) ;;
+    *grad*|*course*|*teaching*|*hw*)    (( scores_grading += 5 )) ;;
+    *data*|*analysis*|*notebook*)       (( scores_data += 5 )) ;;
+    *infra*|*deploy*|*devops*|*worker*) (( scores_devops += 5 )) ;;
+    *design*|*figma*|*assets*)          (( scores_design += 5 )) ;;
+    *research*|*paper*|*lit*)           (( scores_research += 5 )) ;;
+  esac
+
+  local recent_files=""
+  recent_files=$(find . -maxdepth 3 -type f -mmin -10 \
+    -not -path '*/.git/*' -not -path '*/node_modules/*' \
+    -not -path '*/__pycache__/*' -not -path '*/.venv/*' \
+    2>/dev/null | head -30)
+
+  if [[ -n "$recent_files" ]]; then
+    echo "$recent_files" | grep -qiE '\.(py|go|rs|java|rb)$' && (( scores_backend += 3 ))
+    echo "$recent_files" | grep -qiE '(app\.py|main\.py|server\.|routes\.|api/)' && (( scores_backend += 2 ))
+    echo "$recent_files" | grep -qiE '\.(html|css|jsx|tsx|vue|svelte)$' && (( scores_frontend += 3 ))
+    echo "$recent_files" | grep -qiE '(index\.html|styles?\.|component)' && (( scores_frontend += 2 ))
+    echo "$recent_files" | grep -qiE '(marketing|email|campaign|outreach|newsletter)' && (( scores_marketing += 3 ))
+    echo "$recent_files" | grep -qiE '(grad|rubric|assignment|syllabus|student)' && (( scores_grading += 4 ))
+    echo "$recent_files" | grep -qiE '\.(ipynb|parquet|feather)$' && (( scores_data += 4 ))
+    echo "$recent_files" | grep -qiE '(Dockerfile|docker-compose|\.yml|\.yaml)$' && (( scores_devops += 3 ))
+    echo "$recent_files" | grep -qiE '(terraform|ansible|k8s|helm|ci|deploy|worker)' && (( scores_devops += 2 ))
+    echo "$recent_files" | grep -qiE '\.(svg|png|sketch|fig|psd)$' && (( scores_design += 3 ))
+    echo "$recent_files" | grep -qiE '\.(tex|bib|pdf)$' && (( scores_research += 3 ))
+  fi
+
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    local git_files=""
+    git_files=$(git diff --name-only HEAD 2>/dev/null; git diff --name-only --cached 2>/dev/null)
+    if [[ -n "$git_files" ]]; then
+      echo "$git_files" | grep -qiE '\.(py|go|rs|rb)$' && (( scores_backend += 2 ))
+      echo "$git_files" | grep -qiE '\.(html|css|jsx|tsx|vue)$' && (( scores_frontend += 2 ))
+      echo "$git_files" | grep -qiE '\.(ipynb)$' && (( scores_data += 3 ))
+      echo "$git_files" | grep -qiE '(Dockerfile|\.yml|deploy|worker)' && (( scores_devops += 2 ))
+      echo "$git_files" | grep -qiE '(marketing|email|campaign)' && (( scores_marketing += 2 ))
+    fi
+  fi
+
+  local max_score=0
+  local winner="$dir"
+  local -A all_scores=(
+    backend "$scores_backend"
+    frontend "$scores_frontend"
+    marketing "$scores_marketing"
+    grading "$scores_grading"
+    data "$scores_data"
+    devops "$scores_devops"
+    design "$scores_design"
+    research "$scores_research"
+  )
+
+  local cat
+  for cat in ${(k)all_scores}; do
+    if (( all_scores[$cat] > max_score )); then
+      max_score=$all_scores[$cat]
+      winner="$cat"
+    fi
+  done
+
+  echo "$winner $max_score"
+}
+
 # ── Directory-only auto (faster, no file scanning) ──────────────────────────
 
 vs-dir() {

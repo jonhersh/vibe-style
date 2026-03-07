@@ -107,6 +107,36 @@ It **scores each category** and picks the winner. Same project, different day, d
 vs-dir    # fast mode — just checks directory name, no file scanning
 ```
 
+### 🎸 Learning Mode
+
+Don't know what you're working on yet? Let vibe-style figure it out in real time.
+
+```bash
+vs-learn
+```
+
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      🎸 tuning up... 🎸
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  listening to your workflow...
+```
+
+It watches your file activity every 5 seconds. The moment it's confident:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                🎶 song learned! → backend 🎶
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Plays a shred riff, locks in the style, and you're off. 🔥
+
+```bash
+vs-learn      # default: checks every 5 seconds
+vs-learn 10   # chill: checks every 10 seconds
+```
+
 ---
 
 ## 🎨 The Full Preset List
