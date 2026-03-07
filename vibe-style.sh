@@ -46,7 +46,7 @@ _vs_hash_color() {
   local str="$1"
   local -a palette=(33 32 208 135 196 213 37 51 226 165 172 69 114 174 209)
   local hash=0
-  local i
+  local i=0
   for (( i=0; i<${#str}; i++ )); do
     hash=$(( (hash * 31 + $(printf '%d' "'${str:$i:1}")) % ${#palette[@]} ))
   done
@@ -179,7 +179,7 @@ vs() {
 
     list|ls)
       echo "Available styles:"
-      local key
+      local key=""
       for key in ${(k)VS_COLORS}; do
         local cc=$(_vs_color_code "${VS_COLORS[$key]}")
         printf '  \033[38;5;%sm● %-12s\033[0m\n' "$cc" "$key"
@@ -200,7 +200,7 @@ vs() {
     *)
       local tag="$subcmd"
       local color="$2"
-      local color_code
+      local color_code=""
 
       if [[ -n "${VS_COLORS[$tag]}" && -z "$color" ]]; then
         color_code=$(_vs_color_code "${VS_COLORS[$tag]}")
@@ -323,7 +323,7 @@ _vs_detect_context() {
     research "$scores_research"
   )
 
-  local cat
+  local cat=""
   for cat in ${(k)all_scores}; do
     if (( all_scores[$cat] > max_score )); then
       max_score=$all_scores[$cat]
@@ -543,15 +543,13 @@ _vs_learn_snapshot() {
   esac
 
   # 5. Recent shell history — last 15 commands (weight 1 each)
-  local hist_line
-  fc -l -15 -1 2>/dev/null | while read -r _ hist_line; do
-    local result
+  local hist_line="" result=""
+  while read -r _ hist_line; do
     result=$(_vs_learn_classify_cmd "$hist_line")
     if [[ -n "$result" ]]; then
-      local cat="${result% *}"
-      _VS_LEARN_EVENTS+=("$now $cat 1")
+      _VS_LEARN_EVENTS+=("$now ${result% *} 1")
     fi
-  done
+  done < <(fc -l -15 -1 2>/dev/null)
 }
 
 # preexec hook — fires on every command
@@ -559,7 +557,7 @@ _vs_learn_preexec() {
   [[ "$_VS_LEARN_ACTIVE" != true ]] && return
 
   local cmd="$1"
-  local result
+  local result=""
   result=$(_vs_learn_classify_cmd "$cmd")
   if [[ -n "$result" ]]; then
     local cat="${result% *}"
@@ -581,7 +579,7 @@ _vs_learn_evaluate() {
   # Prune events older than 10 minutes
   local cutoff=$(( now - 600 ))
   local -a pruned=()
-  local entry
+  local entry=""
   for entry in "${_VS_LEARN_EVENTS[@]}"; do
     local ts="${entry%% *}"
     (( ts >= cutoff )) && pruned+=("$entry")
@@ -600,7 +598,7 @@ _vs_learn_evaluate() {
 
     # Decay: approximate 0.5^(age/120) using integer math
     # For age 0-30s: factor=100, 30-90s: 80, 90-180s: 50, 180-360s: 25, 360+: 12
-    local factor
+    local factor=0
     if (( age < 30 )); then
       factor=100
     elif (( age < 90 )); then
@@ -619,7 +617,7 @@ _vs_learn_evaluate() {
 
   # Find winner and runner-up
   local winner="" winner_score=0 runner_score=0
-  local cat
+  local cat=""
   for cat in ${(k)scores}; do
     if (( scores[$cat] > winner_score )); then
       runner_score=$winner_score
@@ -633,7 +631,7 @@ _vs_learn_evaluate() {
   # Lock-in: winner >= 1500 (15 * 100), leads by >= 500 (5 * 100), at least 2 RT signals
   if (( winner_score >= 1500 && (winner_score - runner_score) >= 500 && _VS_LEARN_RT_SIGNALS >= 2 )); then
     # Determine color
-    local color_code
+    local color_code=""
     if [[ -n "${VS_COLORS[$winner]}" ]]; then
       color_code=$(_vs_color_code "${VS_COLORS[$winner]}")
     else
