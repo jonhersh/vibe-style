@@ -6,23 +6,9 @@ You've got 4 terminals open. You're flipping between them like a DJ switching tr
 
 **Never again.**
 
-```
-🔵 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ⚡ backend ⚡
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💜 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                        ⚡ frontend ⚡
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🔴 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                         ⚡ devops ⚡
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🟣 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                      ⚡ fixing auth bug ⚡
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+<!-- SCREENSHOT: Replace with a screenshot of 3-4 styled terminals side by side -->
+<!-- How to take: open 3+ terminals, run vs backend / vs frontend / vs devops, screenshot the full VS Code window -->
+![Multiple styled terminals](screenshots/hero.png)
 
 Each terminal gets its own **color**, its own **banner**, its own **vibe**. 🎷
 
@@ -64,6 +50,10 @@ vs design           # 🩷 pink
 vs research         # 🩵 teal
 ```
 
+<!-- SCREENSHOT: Show a single terminal right after running "vs backend" -->
+<!-- How to take: run "vs backend" in a terminal, screenshot showing the banner + top bar + prompt tag -->
+![vs backend example](screenshots/vs-backend.png)
+
 ### 🎯 Custom labels
 
 ```bash
@@ -87,16 +77,9 @@ vs now              # what's my current style?
 
 Every `vs` command pins a colored status bar to the **top row** of your terminal. It stays there as you scroll, run commands, and work — you always know which terminal you're in at a glance.
 
-```
-┌──────────────────────────────────────────────────────────┐
-│  ⚡ backend ⚡                    (colored bar, row 1)   │
-├──────────────────────────────────────────────────────────┤
-│  $ npm start                                             │
-│  Server running on port 3000                             │
-│  ...                                                     │
-│  [backend] $                     (your normal terminal)  │
-└──────────────────────────────────────────────────────────┘
-```
+<!-- SCREENSHOT: Show the persistent top bar after scrolling/running some commands -->
+<!-- How to take: run "vs backend", then run a few commands so the banner scrolls away but the top bar remains -->
+![Persistent top bar](screenshots/top-bar.png)
 
 - The bar redraws automatically on each prompt (survives `clear`, window resizes)
 - `vs off` removes the bar and restores normal scrolling
@@ -280,7 +263,13 @@ You wouldn't wear the same outfit to a rock concert and a board meeting. Why sho
 
 ### VS Code tab names
 
-The installer auto-configures VS Code to show vibe-style labels in terminal tabs (e.g. "⚡ backend" instead of "node"). If you need to set it manually, add to your VS Code `settings.json`:
+The installer auto-configures VS Code to show vibe-style labels in terminal tabs (e.g. "⚡ backend" instead of "node").
+
+<!-- SCREENSHOT: Show the VS Code terminal tab list with styled names like "⚡ backend", "⚡ frontend" -->
+<!-- How to take: open 3+ terminals, style each one, screenshot the tab list on the right side of the terminal panel -->
+![VS Code tab names](screenshots/tab-names.png)
+
+If you need to set it manually, add to your VS Code `settings.json`:
 
 ```json
 {
