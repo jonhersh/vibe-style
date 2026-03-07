@@ -126,7 +126,11 @@ vs-learn
   listening to your workflow...
 ```
 
-It watches your file activity every 10 seconds. The moment it's confident:
+It hooks into your shell and watches every command you run — no polling, no background processes. Run `python app.py` and it scores that as backend. Run `npm run dev` and it scores frontend. Recent commands count more (2-minute half-life), so it adapts as your focus shifts.
+
+At startup it also takes a snapshot of your environment (`$VIRTUAL_ENV`, `package.json`, active servers on ports, recent shell history) for a baseline.
+
+The moment it's confident (winner ≥ 15 points, clear lead, at least 2 real-time signals):
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -137,9 +141,8 @@ It watches your file activity every 10 seconds. The moment it's confident:
 Plays a shred riff, locks in the style, and you're off. 🔥
 
 ```bash
-vs-learn      # default: checks every 10 seconds
-vs-learn 5    # impatient: checks every 5 seconds
-vs-learn 20   # chill: checks every 20 seconds
+vs-learn        # start learning
+vs-learn-stop   # stop early (hooks removed, no cleanup needed)
 ```
 
 ---
