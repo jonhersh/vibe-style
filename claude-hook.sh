@@ -28,6 +28,7 @@ _vs_set_tab() {
 
 case "${1:-start}" in
   start)   _vs_set_tab "⚡" ;;
-  stop)    _vs_set_tab "🔴" ;;
+  stop)    _vs_set_tab "🎸" ;;
+  notify)  _vs_set_tab "🔥" ;;
   resume)  _vs_set_tab "⚡" ;;
 esac
