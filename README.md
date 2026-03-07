@@ -47,7 +47,7 @@ bash ~/vibe-style/install.sh
 source ~/.zshrc
 ```
 
-That's it. Now rip a guitar solo. 🎸🔥
+That's it. Now [unleash the fury](https://youtu.be/dmFzT_BtVLk?si=qBrMNaC557dMw6gf&t=271) 🎸🔥
 
 ---
 
@@ -174,5 +174,5 @@ MIT — do whatever you want with it. Rock on. 🤘
 ---
 
 <p align="center">
-  <i>🎶 Now go put on some Van Halen and open 5 terminals 🎶</i>
+  <i>🎶 Now go <a href="https://youtu.be/rK_d5g3pBb8?si=-b9JAP7ChT9subnJ&t=30">through the fire and flames</a> and open 5 terminals 🎶</i>
 </p>
