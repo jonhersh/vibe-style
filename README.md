@@ -34,6 +34,7 @@ Each terminal gets its own **color**, its own **banner**, its own **vibe**. 🎷
 |---------|-------------|
 | 🏷️ **Tab rename** | VS Code terminal tab says "⚡ backend" instead of "zsh" |
 | 🎨 **Color banner** | Fat colored bar you can't miss when switching terminals |
+| 📌 **Persistent top bar** | Colored status bar pinned to the top of your terminal — always visible |
 | 💬 **Prompt tag** | `[backend] $` — always know where you are |
 | 🧠 **Smart detect** | Scans your recent files & git diff to auto-tag |
 
@@ -79,6 +80,26 @@ vs off              # clear everything, back to default
 vs list             # show all preset styles with colors
 vs now              # what's my current style?
 ```
+
+---
+
+## 📌 Persistent Top Bar
+
+Every `vs` command pins a colored status bar to the **top row** of your terminal. It stays there as you scroll, run commands, and work — you always know which terminal you're in at a glance.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ⚡ backend ⚡                    (colored bar, row 1)   │
+├──────────────────────────────────────────────────────────┤
+│  $ npm start                                             │
+│  Server running on port 3000                             │
+│  ...                                                     │
+│  [backend] $                     (your normal terminal)  │
+└──────────────────────────────────────────────────────────┘
+```
+
+- The bar redraws automatically on each prompt (survives `clear`, window resizes)
+- `vs off` removes the bar and restores normal scrolling
 
 ---
 

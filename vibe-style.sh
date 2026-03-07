@@ -80,6 +80,60 @@ _vs_banner() {
   printf '\n'
 }
 
+# ── Persistent top bar ───────────────────────────────────────────────────────
+# Pins a colored status bar to the top row using terminal scroll regions.
+# The bar stays visible as you work; content scrolls below it.
+
+_vs_draw_topbar() {
+  local tag="$1"
+  local color_code="$2"
+  local cols="${COLUMNS:-$(tput cols 2>/dev/null || echo 80)}"
+  local label="⚡ $tag ⚡"
+  local label_len=${#label}
+  local pad_left=$(( (cols - label_len) / 2 ))
+  local pad_right=$(( cols - label_len - pad_left ))
+
+  # Save cursor, move to row 1 col 1
+  printf '\033[s\033[1;1H'
+  # Draw the bar across full width
+  printf '\033[48;5;%sm\033[38;5;15m\033[1m' "$color_code"
+  printf '%*s' "$pad_left" ''
+  printf '%s' "$label"
+  printf '%*s' "$pad_right" ''
+  printf '\033[0m'
+  # Set scroll region to row 2 onward, restore cursor
+  printf '\033[2;%dr\033[u' "${LINES:-$(tput lines 2>/dev/null || echo 24)}"
+}
+
+_vs_clear_topbar() {
+  local lines="${LINES:-$(tput lines 2>/dev/null || echo 24)}"
+  # Reset scroll region to full terminal
+  printf '\033[1;%dr' "$lines"
+  # Clear row 1
+  printf '\033[s\033[1;1H\033[2K\033[u'
+}
+
+_vs_topbar_precmd() {
+  # Redraw the top bar before each prompt (handles resizes, clears)
+  if [[ -n "$VS_TAG" && -n "$VS_COLOR" ]]; then
+    _vs_draw_topbar "$VS_TAG" "$VS_COLOR"
+  fi
+}
+
+# Register the precmd hook (idempotent)
+_vs_install_topbar_hook() {
+  # Add to precmd_functions if not already there
+  if [[ ${precmd_functions[(ie)_vs_topbar_precmd]} -gt ${#precmd_functions} ]]; then
+    precmd_functions+=(_vs_topbar_precmd)
+  fi
+}
+
+_vs_remove_topbar_hook() {
+  precmd_functions=(${precmd_functions:#_vs_topbar_precmd})
+}
+
+_vs_install_topbar_hook
+
 _vs_set_prompt() {
   local tag="$1"
   local color_code="$2"
@@ -116,6 +170,7 @@ vs() {
       VS_COLOR=""
       _vs_set_title "Terminal"
       _vs_set_prompt "" ""
+      _vs_clear_topbar
       echo "Style cleared."
       return 0
       ;;
@@ -158,6 +213,7 @@ vs() {
 
       _vs_set_title "⚡ ${tag}"
       _vs_banner "$tag" "$color_code"
+      _vs_draw_topbar "$tag" "$color_code"
       _vs_set_prompt "$tag" "$color_code"
 
       return 0
