@@ -570,7 +570,7 @@ VS_ALERT_ENABLED=true
 _vs_play() {
   local sound_file="$VS_SOUNDS_DIR/$1"
   if [[ -f "$sound_file" ]] && command -v afplay &>/dev/null; then
-    afplay "$sound_file" &>/dev/null &
+    afplay -v 0.1 "$sound_file" &>/dev/null &
   fi
 }
 
