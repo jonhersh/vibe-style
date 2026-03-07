@@ -125,16 +125,49 @@ Custom labels get a **deterministic color from the text** — so `"fixing auth"`
 
 ---
 
+## 🎸 Guitar Alerts
+
+Your terminal doesn't just look different — it **sounds** different. Bundled synth guitar tones play when you need attention.
+
+```bash
+vs-riff                    # play a random riff
+vs-riff power-chord        # 🔊 fat E5 power chord
+vs-riff shred-run          # 🔊 ascending shred lick
+vs-riff pinch-harmonic     # 🔊 squealy harmonic
+vs-riff wah-sweep          # 🔊 wah pedal sweep
+vs-riff drop-d-chug        # 🔊 palm-muted chug
+
+vs-alert "Deploy done!"    # riff + message
+vs-alert "Tests passed!" shred-run  # specific riff + message
+
+vs-unmute                  # riff plays every time you style
+vs-mute                    # silence (but why would you)
+```
+
+### 🎵 Available riffs
+
+| Riff | Sound | Best for |
+|------|-------|----------|
+| `power-chord` | Fat distorted E5 | Task complete, deploy done |
+| `shred-run` | Fast ascending notes | Tests passing, build success |
+| `pinch-harmonic` | Squealy harmonic | Notification, needs input |
+| `wah-sweep` | Wah pedal sweep | New session, switching context |
+| `drop-d-chug` | Palm-muted chug | Error, something broke |
+
+---
+
 ## 🤖 Claude Code Integration
 
-Auto-style your terminal when you start a Claude Code session:
+vibe-style was built for Claude Code. Auto-style terminals and get guitar alerts when Claude needs you.
+
+### Auto-style on session start
 
 ```json
 {
   "hooks": {
     "SessionStart": [
       {
-        "command": "vs-auto"
+        "command": "source ~/vibe-style/vibe-style.sh && vs-auto"
       }
     ]
   }
@@ -142,8 +175,39 @@ Auto-style your terminal when you start a Claude Code session:
 ```
 
 Fork a session for backend work → it's blue.
-Fork for marketing → it's green.
+Fork for frontend → it's magenta.
 No thinking required. 🧘
+
+### 🎸 Riff when Claude needs your attention
+
+```json
+{
+  "hooks": {
+    "Notification": [
+      {
+        "command": "source ~/vibe-style/vibe-style.sh && vs-riff power-chord"
+      }
+    ]
+  }
+}
+```
+
+You're in another tab, Claude finishes a task — **POWER CHORD**. You know exactly which terminal and what just happened.
+
+### Full setup (both hooks)
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "command": "source ~/vibe-style/vibe-style.sh && vs-auto" }
+    ],
+    "Notification": [
+      { "command": "source ~/vibe-style/vibe-style.sh && vs-riff power-chord" }
+    ]
+  }
+}
+```
 
 ---
 

@@ -300,3 +300,78 @@ vs-dir() {
     *)  vs "$dir" ;;
   esac
 }
+
+# ── Guitar alerts 🎸 ────────────────────────────────────────────────────────
+# Play guitar riffs as terminal alerts. Uses afplay (macOS) with bundled tones.
+
+VS_SOUNDS_DIR="${0:A:h}/sounds"
+VS_ALERT_ENABLED=true
+
+_vs_play() {
+  local sound_file="$VS_SOUNDS_DIR/$1"
+  if [[ -f "$sound_file" ]] && command -v afplay &>/dev/null; then
+    afplay "$sound_file" &>/dev/null &
+  fi
+}
+
+# Play a specific riff or a random one
+vs-riff() {
+  local riff="$1"
+  local -a riffs=(power-chord wah-sweep shred-run pinch-harmonic drop-d-chug)
+
+  if [[ -z "$riff" ]]; then
+    # Random riff
+    riff="${riffs[$((RANDOM % ${#riffs[@]} + 1))]}"
+  fi
+
+  _vs_play "${riff}.wav"
+}
+
+# Alert — plays a riff when something needs your attention
+vs-alert() {
+  local msg="${1:-Hey! Over here.}"
+  local riff="${2}"
+
+  vs-riff "$riff"
+  printf '\033[1;33m🎸 %s\033[0m\n' "$msg"
+}
+
+# Play riff when styling (optional — set VS_RIFF_ON_STYLE=true)
+VS_RIFF_ON_STYLE=false
+
+# Wrap the original vs to optionally riff on style
+_vs_original=$(functions vs)
+eval "_vs_inner${_vs_original#vs}"
+vs() {
+  _vs_inner "$@"
+  local ret=$?
+  if [[ "$VS_RIFF_ON_STYLE" == true && -n "$1" && "$1" != "off" && "$1" != "list" && "$1" != "now" && "$1" != "help" ]]; then
+    vs-riff
+  fi
+  return $ret
+}
+
+# Toggle alerts on/off
+vs-mute() { VS_RIFF_ON_STYLE=false; VS_ALERT_ENABLED=false; echo "🔇 Muted."; }
+vs-unmute() { VS_RIFF_ON_STYLE=true; VS_ALERT_ENABLED=true; echo "🔊 Unmuted. Let it rip."; }
+
+# ── Claude Code hook helper ──────────────────────────────────────────────────
+# Use as a Notification hook — riffs when Claude needs your attention.
+#
+# Add to .claude/settings.json:
+# {
+#   "hooks": {
+#     "Notification": [
+#       { "command": "source ~/vibe-style/vibe-style.sh && vs-riff power-chord" }
+#     ]
+#   }
+# }
+#
+# Or auto-style on session start:
+# {
+#   "hooks": {
+#     "SessionStart": [
+#       { "command": "source ~/vibe-style/vibe-style.sh && vs-auto" }
+#     ]
+#   }
+# }
