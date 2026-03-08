@@ -232,20 +232,39 @@ No thinking required. 🧘
 
 You're in another tab, Claude finishes a task — **POWER CHORD**. You know exactly which terminal and what just happened.
 
-### Full setup (both hooks)
+### Full setup (tab icons + guitar alerts)
+
+Add to `~/.claude/settings.json`:
 
 ```json
 {
   "hooks": {
     "SessionStart": [
-      { "command": "source ~/vibe-style/vibe-style.sh && vs-auto" }
+      { "matcher": "", "hooks": [{ "type": "command", "command": "bash ~/vibe-style/claude-hook.sh start" }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "bash ~/vibe-style/claude-hook.sh resume" }] }
+    ],
+    "Stop": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "bash ~/vibe-style/claude-hook.sh stop && afplay -v 0.1 ~/vibe-style/sounds/power-chord.wav &" }] }
     ],
     "Notification": [
-      { "command": "source ~/vibe-style/vibe-style.sh && vs-riff power-chord" }
+      { "matcher": "", "hooks": [{ "type": "command", "command": "bash ~/vibe-style/claude-hook.sh notify && afplay -v 0.1 ~/vibe-style/sounds/pinch-harmonic.wav &" }] }
+    ],
+    "SubagentStop": [
+      { "matcher": "", "hooks": [{ "type": "command", "command": "afplay -v 0.1 ~/vibe-style/sounds/drop-d-chug.wav &" }] }
     ]
   }
 }
 ```
+
+| Hook | Tab icon | Sound | Meaning |
+|------|----------|-------|---------|
+| `SessionStart` | ⚡ | — | Claude session started |
+| `PostToolUse` | ⚡ | — | Claude is working |
+| `Stop` | ✅ | power chord | Claude finished, your turn |
+| `Notification` | 🔥 | pinch harmonic | Claude needs your input |
+| `SubagentStop` | — | drop-d chug | Subagent completed |
 
 ---
 
@@ -268,11 +287,13 @@ You wouldn't wear the same outfit to a rock concert and a board meeting. Why sho
 
 The installer auto-configures VS Code to show vibe-style labels in terminal tabs (e.g. "⚡ backend" instead of "node").
 
+> **Requires VS Code 1.86+.** The `${sequence}` variable for terminal tab titles was added in January 2024. If your tabs aren't updating, check your version (**Code → About**) and update from [code.visualstudio.com](https://code.visualstudio.com).
+
 <!-- SCREENSHOT: Show the VS Code terminal tab list with styled names like "⚡ backend", "⚡ frontend" -->
 <!-- How to take: open 3+ terminals, style each one, screenshot the tab list on the right side of the terminal panel -->
 ![VS Code tab names](screenshots/tab-names.png)
 
-If you need to set it manually, add to your VS Code `settings.json`:
+If you need to set it manually, add to your VS Code `settings.json` (**Cmd+Shift+P** → "Preferences: Open User Settings (JSON)"):
 
 ```json
 {
@@ -284,6 +305,8 @@ If you need to set it manually, add to your VS Code `settings.json`:
 ## 📋 Requirements
 
 - zsh (default on macOS)
+- VS Code 1.86+ (for terminal tab names)
+- macOS (for `afplay` guitar alerts — sounds are optional on other OSes)
 - A mass quantity of mass vibes 🎷
 
 ## 📄 License
